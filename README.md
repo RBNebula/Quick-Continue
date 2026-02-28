@@ -15,7 +15,7 @@ Adds a `Continue` button to the main menu between `New Game` and `Load Game`.
 
 ## Config
 
-Generated config: `BepInEx/config/QuickContinue/com.rbplex.quickcontinue.cfg`
+Generated config: `BepInEx/config/QuickContinue/com.quickcontinue.cfg`
 
 - `Continue.LastSaveName`: tracked save used by Continue.
 - `Continue.FallbackToMostRecentSave`: fallback when tracked save cannot be used.

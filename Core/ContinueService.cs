@@ -44,22 +44,24 @@ internal sealed class ContinueService
             return false;
         }
 
-        return SavingLoadingManager.GetAllSaveFileHeaderFileCombos().Count > 0;
+        return SavingLoadingManager.GetAllSaveFileHeaderFileCombos()
+            .Any(combo => combo?.SaveFileHeader != null);
     }
 
-    internal bool TryGetContinueTarget(out string fullPath, out string sceneName, out string saveName)
+    internal bool TryGetContinueTarget(out string fullPath, out string sceneName, out string saveName, out GameModeType gameMode)
     {
-        if (TryResolveFromConfiguredName(out fullPath, out sceneName, out saveName))
+        if (TryResolveFromConfiguredName(out fullPath, out sceneName, out saveName, out gameMode))
         {
             return true;
         }
 
         if (!_config.FallbackToMostRecentSave.Value)
         {
+            gameMode = default;
             return false;
         }
 
-        return TryResolveMostRecent(out fullPath, out sceneName, out saveName);
+        return TryResolveMostRecent(out fullPath, out sceneName, out saveName, out gameMode);
     }
 
     private bool HasConfiguredSaveCandidate()
@@ -74,11 +76,12 @@ internal sealed class ContinueService
         return SavingLoadingManager.GetSaveFileHeader(candidatePath) != null;
     }
 
-    private bool TryResolveFromConfiguredName(out string fullPath, out string sceneName, out string saveName)
+    private bool TryResolveFromConfiguredName(out string fullPath, out string sceneName, out string saveName, out GameModeType gameMode)
     {
         fullPath = string.Empty;
         sceneName = string.Empty;
         saveName = string.Empty;
+        gameMode = default;
 
         var configured = _config.LastSaveName.Value;
         if (string.IsNullOrWhiteSpace(configured))
@@ -100,14 +103,16 @@ internal sealed class ContinueService
 
         fullPath = candidatePath;
         saveName = Path.GetFileNameWithoutExtension(candidatePath);
+        gameMode = header.GameMode;
         return true;
     }
 
-    private static bool TryResolveMostRecent(out string fullPath, out string sceneName, out string saveName)
+    private static bool TryResolveMostRecent(out string fullPath, out string sceneName, out string saveName, out GameModeType gameMode)
     {
         fullPath = string.Empty;
         sceneName = string.Empty;
         saveName = string.Empty;
+        gameMode = default;
 
         var sorted = SavingLoadingManager.GetAllSaveFileHeaderFileCombos()
             .Select(combo => new
@@ -131,6 +136,7 @@ internal sealed class ContinueService
 
             fullPath = item.Combo.FullFilePath;
             saveName = Path.GetFileNameWithoutExtension(fullPath);
+            gameMode = item.Combo.SaveFileHeader.GameMode;
             return !string.IsNullOrWhiteSpace(fullPath);
         }
 

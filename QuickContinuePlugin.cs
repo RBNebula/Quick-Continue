@@ -1,6 +1,6 @@
 namespace QuickContinue;
 
-[BepInPlugin(ModInfo.Guid, ModInfo.Name, ModInfo.Version)]
+[BepInPlugin(ModInfo.PLUGIN_GUID, ModInfo.PLUGIN_NAME, ModInfo.PLUGIN_VERSION)]
 public sealed class QuickContinuePlugin : BaseUnityPlugin
 {
     private Harmony? _harmony;
@@ -9,7 +9,7 @@ public sealed class QuickContinuePlugin : BaseUnityPlugin
     {
         QuickContinueRuntime.Initialize(Logger);
 
-        _harmony = new Harmony(ModInfo.Guid);
+        _harmony = new Harmony(ModInfo.HARMONY_ID);
         _harmony.PatchAll();
     }
 

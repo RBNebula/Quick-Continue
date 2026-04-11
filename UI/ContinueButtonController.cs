@@ -92,7 +92,7 @@ internal sealed class ContinueButtonController
             return;
         }
 
-        if (!_continueService.TryGetContinueTarget(out var fullPath, out var sceneName, out var saveName))
+        if (!_continueService.TryGetContinueTarget(out var fullPath, out var sceneName, out var saveName, out var gameMode))
         {
             _logger.LogWarning(ContinueUnavailableMessage);
             return;
@@ -100,7 +100,7 @@ internal sealed class ContinueButtonController
 
         _continueService.SetLastSaveName(saveName);
         HideMainMenuPanels(menu);
-        manager.LoadSceneThenLoadSave(fullPath, sceneName);
+        manager.LoadSceneThenLoadSave(fullPath, sceneName, gameMode);
     }
 
     private static void HideMainMenuPanels(MainMenu menu)
@@ -112,8 +112,14 @@ internal sealed class ContinueButtonController
 
     private static void SetButtonLabel(Button button, string label)
     {
-        var text = button.GetComponentInChildren<TMP_Text>(includeInactive: true);
-        if (text != null)
+        var tmpTexts = button.GetComponentsInChildren<TMP_Text>(includeInactive: true);
+        foreach (var text in tmpTexts)
+        {
+            text.text = label;
+        }
+
+        var legacyTexts = button.GetComponentsInChildren<Text>(includeInactive: true);
+        foreach (var text in legacyTexts)
         {
             text.text = label;
         }
